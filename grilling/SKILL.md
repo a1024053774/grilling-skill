@@ -65,7 +65,7 @@ Give every meaningful item a stable ID and state:
 
 Keep these separate: goal, users, non-goals, success measures, constraints, requirements, decisions, assumptions, evidence, risks, open questions, dependencies, and current frontier. Record source, stage, round, and owner where relevant. Never silently turn an inference into a requirement or overwrite a conflict; link the affected IDs and put resolution on the frontier.
 
-The ledger records the conversation. At a stage gate, the accepted result must also be written to the project's canonical artifact, with a link or commit reference from the ledger. If no canonical home has been chosen, make that decision explicit before claiming the stage is complete.
+The ledger records the conversation. At a stage gate, the accepted result must also be written to the project's canonical artifact, with a link or commit reference from the ledger. Name the human owner for each gate: the Agent drafts and flags concerns, while the owner corrects, accepts, rejects, or records an explicit exception. If no canonical home has been chosen, make that decision explicit before claiming the stage is complete. When the project uses version control, commit accepted artifacts and their linkage; otherwise use the approved system of record and retain its revision or audit reference.
 
 ## Agent-project decision tree
 
@@ -188,6 +188,8 @@ intent.md
 ```
 
 The exact filenames may differ if the project already has an accepted system of record, but the handoff and linkage must remain explicit.
+
+A stage gate is complete only after its named human owner accepts the artifact or records a rejection/exception.
 
 A grilling session is complete only when:
 
