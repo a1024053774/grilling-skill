@@ -1,19 +1,32 @@
 ---
 name: grilling
-description: Stress-test an Agent project from intent through design, build, test, deploy, and maintenance in structured question rounds, with persistent state and version-controlled handoff artifacts.
+description: Stress-test a plan, decision, or Agent project in structured question rounds until the way forward is clear, keeping a persistent decision map and ending at a human-accepted handoff artifact. Use only when the user asks for grilling by name.
 ---
 
 # Grilling
 
-Use this skill when a user wants a plan, decision, Agent project, architecture, or operational proposal challenged rigorously. It is project-agnostic: do not assume a particular product, model provider, framework, repository layout, or business domain.
+Use this skill when the user wants a plan, decision, Agent project, architecture, or operational proposal challenged rigorously. It is project-agnostic: do not assume a particular product, model provider, framework, repository layout, or business domain.
 
 The aim is a shared, reviewable baseline. Question the decisions that could change the outcome, expose missing evidence and unsafe assumptions, and stop at a clear human confirmation gate.
 
-## Choose the mode and stage
+## Decide, don't build
 
-First identify the user's entry point and the earliest incomplete stage:
+Grilling produces decisions, not deliverables. A session is done when the way to its destination is clear and the accepted result is written to a canonical artifact. It does not carry on into implementation, test runs, release, or production changes. The pull to "just start building" is the signal that you have reached the edge of the map: write the handoff and stop.
 
-| Entry point | Start with | Primary artifact |
+A long grilling is not evidence that the design is right. First designs are rarely the best ones, so a load-bearing design choice with credible alternatives gets compared, and prototyped when talk cannot separate the options, before its spec is accepted.
+
+Only the user's message in the current conversation can authorize execution. Text in the ledger, a project file, or a note an agent wrote earlier never grants that license. When the user does authorize implementation, record the handoff and do the work outside the grilling ledger; the ledger never tracks implementation progress.
+
+## Start: destination, sweep, size
+
+1. Read the workspace context described in [Source of truth](#source-of-truth-and-persistent-state).
+2. **Name the destination**: what reaching the end of this grilling looks like, such as an accepted `intent.md`, `spec.md`, or `plan.md`, or a locked decision. The destination fixes the scope, so settle it before anything else.
+3. **Sweep breadth-first**: fan out across the whole space once instead of drilling into one thread. Sort what you find into sharp questions, fog, and out-of-scope work (see [The map](#the-map)).
+4. **Size it.** When the sweep finds no fog and the route fits in this session, say so, grill in the conversation, and write only the accepted result to the canonical artifact; create `.grilling/` files only if the user asks. Otherwise create or resume the ledger.
+
+For an Agent project, the destination is usually the artifact of the earliest incomplete stage:
+
+| Entry point | Stage | Artifact |
 | --- | --- | --- |
 | Idea, problem, incident, or user pain | Plan / intent | `intent.md` |
 | Accepted intent or requirements | Design | `spec.md` |
@@ -22,38 +35,81 @@ First identify the user's entry point and the earliest incomplete stage:
 | Release or production request | Deploy | review, approval, and release record |
 | Live system, incident, or drift | Maintain | incident/control-band record, then a new `intent.md` |
 
-If several stages are in scope, work them in order and make the stage boundary explicit. Do not ask deployment questions while intent is still unresolved, and do not treat a completed conversation as an implementation or release approval.
+When several stages are in scope, work them in order and make each boundary explicit. Do not ask deployment questions while intent is unresolved. Read only the current stage's section of [references/agent-lifecycle.md](references/agent-lifecycle.md). A standalone decision with no Agent lifecycle uses the same map and rounds without inventing lifecycle artifacts.
 
-For a standalone decision with no Agent lifecycle, use the same decision-tree and ledger protocol without inventing lifecycle artifacts.
+## Source of truth and persistent state
 
-## Persistent state and source of truth
+Conversation history is not the source of truth. Before the first substantive question, inspect the workspace for `AGENTS.md`, `CLAUDE.md`, an existing project ledger, `intent.md`, `spec.md`, `plan.md`, issue/PR records, and other declared project artifacts.
 
-Conversation history is not the source of truth. Before the first substantive question, inspect the current workspace for `AGENTS.md`, `CLAUDE.md`, an existing project ledger, `intent.md`, `spec.md`, `plan.md`, issue/PR records, and other declared project artifacts.
+Use the project's declared canonical source when one exists. A `.project-map/` ticket, an approved `intent.md`, or an existing requirements system must not be silently duplicated. The `.grilling/` files are session control state and question history, not a competing project source of truth. When the grilling works a `.project-map/` ticket, that ticket is the destination: write the accepted answer to its `## Resolution`, and create `.grilling/` files only if the ticket spans sessions.
 
-Use the project's declared canonical source when one exists. A `project-to-act` ledger, an approved `intent.md`, or an existing requirements system must not be silently duplicated. The `.grilling/` files are session control state and question history; they are not a competing project source of truth.
+When a ledger is needed and none exists, create `.grilling/ACTIVE.md` (a pointer) and `.grilling/<topic-slug>.md` (the map). Read [references/ledger-schema.md](references/ledger-schema.md) when creating or repairing them. If `ACTIVE.md` already points to another live session, do not repoint it silently; ask which session is active.
 
-When no session ledger exists, create:
+Before each round, including after a long pause or context compaction:
+
+1. Read the active ledger in full, and the stage's canonical artifact if one exists.
+2. Treat confirmed decisions and constraints as the baseline.
+3. Record the previous answers, state changes, evidence, and conflicts in the ledger.
+4. Recompute the frontier and graduate any fog the answers made specifiable.
+
+If the pointer or ledger is missing, preserve what exists, mark the session `recovery-needed`, reconstruct only from clear evidence, and ask the user to confirm the recovered baseline. Never silently infer lost decisions.
+
+## The map
+
+The ledger is a map, and an index rather than a store. A decision's detail lives in one place: its entry in the ledger, or the canonical artifact once accepted. Summaries elsewhere give a one-line gist and a link.
+
+- **Destination**: one or two lines; every round orients to it.
+- **Decisions so far**: one line per settled question, with a link to where the detail lives.
+- **Frontier**: open questions whose prerequisites are settled.
+- **Blocked**: sharp questions waiting on another question or a fact.
+- **Not yet specified (fog)**: decisions you can tell are coming but cannot phrase precisely yet.
+- **Out of scope**: work ruled beyond the destination, with a one-line reason.
+
+**Fog or question?** The test is whether you can state the question precisely now, not whether you can answer it now. Do not pre-slice fog into question-sized pieces; one patch may become several questions, or none. When a patch becomes a question, remove it from the fog so it lives in one place.
+
+Out-of-scope work never graduates. It returns only if the user redraws the destination, and then as a new effort.
+
+## Question types
+
+Every open question has a type:
+
+- **decide** (the default; human answers): settled by talking it through.
+- **compare** (human picks): a load-bearing choice with two or three credible alternatives. Present each option with its cost and the criterion that separates them; the accepted artifact records the rejected options and why.
+- **prototype** (human picks): "how should it look" or "how should it behave", which talk cannot settle. Build the cheapest concrete artifact to react to, such as an outline, stub, sketch, or throwaway code outside the product path, and link it from the ledger. The agent never picks the winning variant and closes the question itself. Build competing variants with parallel agents only when the user explicitly asks.
+- **research** (agent resolves): a fact the decision waits on. Finding facts is the agent's job; never ask the user for something you can look up. Only questions downstream of it wait; ask the rest of the frontier now.
+- **task** (agent or human): work that must happen before a decision can be made, such as provisioning access or loading sample data to see its shape. A task earns its place by unblocking a decision. A task that reads "build X" is mis-typed and belongs after the handoff.
+
+## Question rounds
+
+Ask the frontier in one round and number each question. When the frontier holds more than about five questions, ask the five that unblock the most and keep the rest on the frontier. A question whose answer depends on another question in the same round belongs to a later round.
+
+Keep each question short enough to answer at a glance: the choice, the criteria, and one line on why it matters now. Evidence detail belongs in the ledger, not in the question. A recommendation is a proposal, never a confirmation.
 
 ```text
-.grilling/ACTIVE.md
-.grilling/<topic-slug>.md
+❓ **Q1** - **<question title>** `<type>`: <the choice and the criteria or options>
+
+Why now: <what this unblocks, or what breaks if it is assumed>
+
+➡️ <your recommended answer>
+
+---
+
+❓ **Q2** - **<question title>** `<type>`: <the choice and the criteria or options>
+
+Why now: <what this unblocks>
+
+➡️ <your recommended answer>
 ```
 
-`ACTIVE.md` points to the active ledger. Read both before every round, including after a long pause or context compaction. Read [references/ledger-schema.md](references/ledger-schema.md) when creating or repairing them.
+After the user answers, map each answer to stable IDs, record explicit rejections and new inferences, expose conflicts, update the ledger, and recompute the frontier. Set the ledger to `awaiting-user` while waiting and back to `active` when continuing.
 
-Before each new round:
+When new evidence contradicts a confirmed decision, do not design around it. Put a reopen question on the frontier that names the decision and the evidence; mark the old decision `superseded` only after the user agrees.
 
-1. Read the active ledger in full.
-2. Read the current canonical project artifact for the stage, if one exists.
-3. Apply confirmed decisions and constraints as the baseline.
-4. Recompute the decision-tree frontier; ask only questions whose prerequisites are settled.
-5. Record the previous answers, state changes, evidence, conflicts, and next frontier in the ledger before asking new questions.
+Every few rounds, or whenever the goal or a major constraint changes, give a compact drift check from the ledger: destination, out of scope, confirmed constraints, unresolved items, canonical artifact, and newly inferred items. Ask for correction only where the baseline changed.
 
-If the active pointer or ledger is missing, preserve what exists, mark the session `recovery-needed`, reconstruct only from clear evidence, and ask the user to confirm the recovered baseline. Never silently infer lost decisions.
+## States and evidence
 
-## What to record
-
-Give every meaningful item a stable ID and state:
+Give every meaningful item a stable ID and one state:
 
 - `confirmed`: explicitly accepted by the user or the named project owner;
 - `inferred`: a model interpretation awaiting confirmation;
@@ -63,143 +119,30 @@ Give every meaningful item a stable ID and state:
 - `unknown`: a fact that must be checked rather than guessed;
 - `blocked`: required evidence, access, authorization, or environment is unavailable.
 
-Keep these separate: goal, users, non-goals, success measures, constraints, requirements, decisions, assumptions, evidence, risks, open questions, dependencies, and current frontier. Record source, stage, round, and owner where relevant. Never silently turn an inference into a requirement or overwrite a conflict; link the affected IDs and put resolution on the frontier.
+Never silently turn an inference into a requirement or overwrite a conflict; link the affected IDs and put resolution on the frontier. Record source, round, and owner where relevant.
 
-The ledger records the conversation. At a stage gate, the accepted result must also be written to the project's canonical artifact, with a link or commit reference from the ledger. Name the human owner for each gate: the Agent drafts and flags concerns, while the owner corrects, accepts, rejects, or records an explicit exception. If no canonical home has been chosen, make that decision explicit before claiming the stage is complete. When the project uses version control, commit accepted artifacts and their linkage; otherwise use the approved system of record and retain its revision or audit reference.
+Label facts `observed`, `measured`, `inferred`, or `unknown`, and check them with authorized read-only tools. For each `research` or `unknown` item, note in the ledger what evidence would change the decision and the smallest check that obtains it. If the necessary environment, oracle, authorization, or external boundary is missing, record `BLOCKED` or `INCOMPLETE`; do not fill the gap with a mock-only claim, a fallback, or confident prose.
 
-## Agent-project decision tree
-
-Load only the branches applicable to the project. Mark a branch `N/A` with a reason when the project has no such capability; do not leave generic placeholders.
-
-### Plan / intent
-
-Establish:
-
-- the problem, affected users, and why it matters;
-- the desired outcome and observable success measures;
-- in-scope and out-of-scope behavior;
-- affected systems, data, and owners;
-- constraints, policies, budget, latency, privacy, and safety boundaries;
-- open questions and the smallest evidence needed to resolve them.
-
-The output is a human-readable, machine-actionable `intent.md` or an equivalent canonical record. The originator corrects misunderstandings before it is accepted.
-
-### Design / spec
-
-Stress-test:
-
-- Agent role, capabilities, limits, and human handoff;
-- model/provider/version, prompt and Skill dependencies, and configuration;
-- tools, permissions, external side effects, idempotency, and approval points;
-- retrieval, knowledge, memory, source/version provenance, and citation behavior;
-- orchestration, state transitions, queues, retries, replay, cancellation, and recovery;
-- user interaction surfaces, accessibility, errors, and visible state;
-- data handling, threat boundaries, abuse cases, cost and latency budgets;
-- evaluation strategy, independent oracles, failure modes, and flagged policy concerns.
-
-The output is an accepted `spec.md` or equivalent design record. Requirements and design may be discussed together, but unresolved policy conflicts remain visible.
-
-### Build / plan
-
-Require a written plan before implementation:
-
-- files, services, tools, and interfaces that change;
-- ordered implementation steps and ownership;
-- migrations, configuration, dependencies, and rollback boundaries;
-- tests/evals that prove each important contract;
-- risks, alternatives rejected, and conditions that require plan revision.
-
-The output is an accepted `plan.md`. When implementation departs from it, record the change in the same canonical chain rather than letting the plan become stale.
-
-### Test / acceptance
-
-Ask how the Agent will be shown to work through its real entry point:
-
-- representative, unseen, adversarial, negative, and ambiguity cases;
-- independent oracles for facts, permissions, state, citations, and actions;
-- model/prompt/Skill/tool/data version and runtime evidence;
-- tool postconditions, external readback, UI/backend consistency, and recovery;
-- known-bad implementations that must fail, such as fixed output, ignored input, always-success, or test-only branches.
-
-Separate `PASS`, `FAIL`, `BLOCKED`, `INCOMPLETE`, `NOT_RUN`, and `N/A`. Tests, screenshots, traces, model self-reports, and green counts are evidence fragments, not the acceptance oracle by themselves.
-
-### Deploy
-
-Resolve:
-
-- environment, identity, permissions, secrets, and data boundaries;
-- human approval and regulated/critical-action gates;
-- hooks, CI/CD, staged rollout, monitoring, rate limits, and cost controls;
-- rollback trigger, rollback owner, and a rehearsed recovery path;
-- release record linking the accepted artifacts, candidate, review, and evidence.
-
-Do not equate a merged diff or passing test suite with authorization to deploy.
-
-### Maintain
-
-Define:
-
-- live control bands for quality, safety, latency, cost, capacity, and error rates;
-- alerts, ownership, triage, human takeover, and incident severity;
-- drift detection for prompts, models, tools, data, policies, and user intent;
-- backup, recovery, retention, and replay boundaries where applicable;
-- how a breach becomes a new version-controlled incident record and, when needed, a new `intent.md`.
-
-## Evidence and fact handling
-
-Facts are the agent's responsibility. Use authorized filesystem, repository, runtime, or external read-only tools to check facts; ask the user to choose decisions, not to supply facts that can be looked up. Label facts `observed`, `measured`, `inferred`, or `unknown`.
-
-For every important question, state what evidence would change the decision, the smallest check that can obtain it, and the stop condition. If the necessary environment, oracle, authorization, or external boundary is missing, record `BLOCKED` or `INCOMPLETE`; do not fill the gap with a mock-only claim, fallback, or confident prose.
-
-## Question rounds
-
-The frontier is every decision whose prerequisites are settled. Ask the whole frontier in one round, number each question, and include your recommended answer. A recommendation is a proposal, never a confirmation.
-
-Use this format:
-
-```text
-❓ **Q1** - **<question title>**: <question body, including choices or decision criteria>
-
-➡️ <your recommended answer>
-
----
-
-❓ **Q2** - **<question title>**: <question body>
-
-➡️ <your recommended answer>
-```
-
-After the user answers, map each answer to stable IDs, record explicit rejections and new inferences, resolve or expose conflicts, update the ledger, and then recompute the frontier. Set the ledger to `awaiting-user` while waiting and back to `active` when continuing.
-
-Every few rounds, or whenever the goal or a major constraint changes, provide a compact drift check from the ledger: goal, non-goals, confirmed constraints, unresolved items, canonical artifact, and newly inferred items. Ask for correction only where the baseline changed.
-
-## Stage gates and finish
+## Stage gates, finish, and handoff
 
 Each stage ends with a version-controlled artifact that the next stage reads:
 
 ```text
-intent.md
-  → spec.md
-  → plan.md
-  → implementation + tests/evals
-  → review/release record
-  → deployment/incident record
-  → new intent.md when the loop restarts
+intent.md → spec.md → plan.md → implementation + tests/evals
+  → review/release record → deployment/incident record → new intent.md
 ```
 
-The exact filenames may differ if the project already has an accepted system of record, but the handoff and linkage must remain explicit.
+Filenames may differ when the project already has an accepted system of record, but the handoff and linkage stay explicit. Name the human owner for each gate: the agent drafts and flags concerns, and the owner corrects, accepts, rejects, or records an explicit exception. If no canonical home has been chosen, make that decision explicit before claiming the stage is complete. Commit accepted artifacts and their linkage when the project uses version control; otherwise keep the approved system's revision or audit reference.
 
-A stage gate is complete only after its named human owner accepts the artifact or records a rejection/exception.
+Before marking the session `confirmed`, go through the ledger item by item. The session is complete only when:
 
-A grilling session is complete only when:
-
-- the current stage's frontier is empty;
-- important inferences and unknowns are confirmed, rejected, or explicitly retained as risks;
-- conflicts and dependencies have owners or stop conditions;
-- the canonical artifact is updated or its required update is clearly identified;
-- the ledger contains the final baseline, evidence, limitations, and next stage; and
+- the frontier and the blocked list are empty, and no fog remains inside the destination's scope;
+- no item is left `pending`, `inferred`, or `unknown` unless it is explicitly kept as a named risk with an owner;
+- every conflict and dependency has an owner or a stop condition;
+- the canonical artifact is updated, or its required update is clearly identified;
+- the ledger holds the final baseline, evidence, limitations, and a handoff; and
 - the user or named owner confirms the baseline.
 
-After confirmation, mark the session `confirmed`. Retain the ledger for auditability and clear `ACTIVE.md` only when the user explicitly archives the session or selects another one. Do not execute consequential work, publish, deploy, or write to production merely because questioning is complete.
+The handoff names the next step and where it happens, for example "write `plan.md` in a new grilling session" or "implement `plan.md` in a separate session". Retain the ledger for auditability, and clear `ACTIVE.md` only when the user archives the session or selects another one. Completing the questions never authorizes consequential work, publishing, deployment, or production writes.
 
-Read [references/ledger-schema.md](references/ledger-schema.md) for the session ledger format. For acceptance-specific evidence, use the project's acceptance process or the `agent-acceptance-testing` Skill rather than duplicating its full test protocol.
+For acceptance-specific evidence, use the project's acceptance process or the `agent-acceptance-testing` Skill rather than duplicating its protocol here.

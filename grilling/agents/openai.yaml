@@ -1,3 +1,7 @@
 interface:
   display_name: "Grilling"
-  short_description: "Stress-test thinking a round of questions at a time"
+  short_description: "Stress-test a plan in question rounds until the way forward is clear"
+  default_prompt: "Use $grilling to stress-test this plan: name the destination, sweep the open decisions, and question me in rounds until the handoff is clear."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,51 +1,73 @@
 # Grilling ledger schema
 
-Use one Markdown file per session. YAML frontmatter makes the active state easy to scan; the sections below keep the human-readable record useful.
+Use one Markdown file per session. It is a map and an index: one line per item, with a link wherever the detail lives in a canonical artifact. YAML frontmatter makes the state easy to scan.
 
 ```yaml
 session_id: grilling-<topic>-<yyyymmdd>
-status: active
+status: active            # active | awaiting-user | recovery-needed | confirmed
 topic: <short topic>
+destination_artifact: <path or system of record, e.g. spec.md>
 created_at: <timestamp>
 updated_at: <timestamp>
 last_round: 0
 ```
 
-Recommended sections:
+Sections:
 
 ```markdown
-## Goal
+## Destination
 
-## Non-goals
+<one or two lines: what reaching the end of this grilling looks like>
 
-## Confirmed requirements and constraints
+## Out of scope
 
-## Decision tree
+- <work ruled beyond the destination> | reason: ...
 
-## Decisions
+## Confirmed constraints
 
-<!-- D1 | state: confirmed | source: round 1 | rationale: ... -->
+- C1 | state: confirmed | source: round 1 | ...
 
-## Assumptions and facts
+## Decisions so far
 
-<!-- A1 | state: inferred | source: round 1 | evidence: ... -->
+- D1 | state: confirmed | type: compare | source: round 2 | <one-line gist> | rejected: <options and why> | detail: spec.md#section
 
-## Open questions
+## Facts
 
-<!-- Q1 | state: pending | prerequisites: ... | recommended answer: ... -->
+- F1 | state: observed | source: <path, command, or URL, date> | ...
 
-## Current frontier
+## Frontier
+
+- Q7 | type: decide | why now: ... | recommended: ...
+
+## Blocked
+
+- Q9 | type: decide | blocked by: Q7, F3
+
+## Not yet specified
+
+- <a patch of fog: the suspected question or area to revisit>
 
 ## Risks and conflicts
 
-## Final baseline
+- R1 | state: open | owner: ... | affects: D2, Q9
+
+## Handoff
+
+<final baseline, limitations, and the next step: what happens next, where, and who owns it>
 
 ## Changelog
 
-<!-- Round 1: ... -->
+- Round 1: ...
 ```
 
-`ACTIVE.md` should contain only a pointer, for example:
+Rules:
+
+- A question moves from Frontier or Blocked to Decisions so far when answered; it is never listed in two places. A fog patch is deleted when it graduates into questions.
+- Prototype and research outputs are linked, not pasted.
+- The ledger never records implementation steps, test runs, or release progress. Those belong to the canonical project record after the handoff.
+- Before setting `status: confirmed`, every item must be `confirmed`, `rejected`, or `superseded`, or listed under Risks and conflicts with an owner.
+
+`ACTIVE.md` contains only a pointer, for example:
 
 ```markdown
 active_session: .grilling/payment-refactor.md
