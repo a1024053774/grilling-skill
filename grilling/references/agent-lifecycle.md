@@ -55,7 +55,7 @@ Ask how the Agent will be shown to work through its real entry point:
 - tool postconditions, external readback, UI/backend consistency, and recovery;
 - known-bad implementations that must fail, such as fixed output, ignored input, always-success, or test-only branches.
 
-Separate `PASS`, `FAIL`, `BLOCKED`, `INCOMPLETE`, `NOT_RUN`, and `N/A`. Tests, screenshots, traces, model self-reports, and green counts are evidence fragments, not the acceptance oracle by themselves. Grilling settles the acceptance design; running it belongs to the project's acceptance process or the `agent-acceptance-testing` Skill.
+Separate `PASS`, `FAIL`, `BLOCKED`, `INCOMPLETE`, `NOT_RUN`, and `N/A`. Tests, screenshots, traces, model self-reports, and green counts are evidence fragments, not the acceptance oracle by themselves. Grilling settles the acceptance design. Running it belongs to the project's acceptance process, and judging the evidence to the `behavioral-acceptance-review` Skill (its Agent-products reference covers capability profiles, evidence layers, and release verdicts).
 
 ## Deploy
 

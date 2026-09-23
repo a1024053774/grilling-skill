@@ -145,4 +145,4 @@ Before marking the session `confirmed`, go through the ledger item by item. The 
 
 The handoff names the next step and where it happens, for example "write `plan.md` in a new grilling session" or "implement `plan.md` in a separate session". Retain the ledger for auditability, and clear `ACTIVE.md` only when the user archives the session or selects another one. Completing the questions never authorizes consequential work, publishing, deployment, or production writes.
 
-For acceptance-specific evidence, use the project's acceptance process or the `agent-acceptance-testing` Skill rather than duplicating its protocol here.
+For acceptance-specific evidence, use the project's acceptance process or the `behavioral-acceptance-review` Skill rather than duplicating its protocol here.
