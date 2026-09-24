@@ -24,6 +24,7 @@ Stress-test:
 - model/provider/version, prompt and Skill dependencies, and configuration;
 - tools, permissions, external side effects, idempotency, and approval points;
 - retrieval, knowledge, memory, source/version provenance, and citation behavior;
+- module boundaries: each new interface should be a **deep module** that hides substantial implementation behind a small interface;
 - orchestration, state transitions, queues, retries, replay, cancellation, and recovery;
 - user interaction surfaces, accessibility, errors, and visible state;
 - data handling, threat boundaries, abuse cases, cost and latency budgets;
@@ -38,7 +39,7 @@ The output is an accepted `spec.md` or equivalent design record. Requirements an
 Require a written plan before implementation:
 
 - files, services, tools, and interfaces that change;
-- ordered implementation steps and ownership, starting with a thin end-to-end slice when the work spans layers;
+- ordered implementation steps and ownership, starting with a **tracer bullet** when the work spans layers: one thin slice through every layer that stays as production code, unlike a throwaway `prototype`;
 - migrations, configuration, dependencies, and rollback boundaries;
 - tests/evals that prove each important contract;
 - risks, alternatives rejected, and conditions that require plan revision.

@@ -103,6 +103,8 @@ Why now: <what this unblocks>
 
 After the user answers, map each answer to stable IDs, record explicit rejections and new inferences, expose conflicts, update the ledger, and recompute the frontier. Set the ledger to `awaiting-user` while waiting and back to `active` when continuing.
 
+Keep a **ubiquitous language**: phrase questions and record decisions in the domain terms the user and project already use. When one concept goes by two names across the user, code, and docs, put the naming on the frontier as a `decide` question, then use the settled term everywhere: ledger, artifacts, and handoff.
+
 When new evidence contradicts a confirmed decision, do not design around it. Put a reopen question on the frontier that names the decision and the evidence; mark the old decision `superseded` only after the user agrees.
 
 Every few rounds, or whenever the goal or a major constraint changes, give a compact drift check from the ledger: destination, out of scope, confirmed constraints, unresolved items, canonical artifact, and newly inferred items. Ask for correction only where the baseline changed.
