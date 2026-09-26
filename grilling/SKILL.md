@@ -69,6 +69,10 @@ The ledger is a map, and an index rather than a store. A decision's detail lives
 
 Out-of-scope work never graduates. It returns only if the user redraws the destination, and then as a new effort.
 
+## Domain language
+
+Keep one vocabulary while grilling. Read the project's glossary (`CONTEXT.md` at the repository root) before the first round. When the user's term conflicts with the glossary, say so and ask which is meant; when a term is vague or overloaded, propose one precise term; when the user describes how something works, check the code and surface any contradiction. Write a settled term into the glossary right away, creating the file with the first one. The glossary holds terms only, never implementation details.
+
 ## Question types
 
 Every open question has a type:
@@ -145,6 +149,6 @@ Before marking the session `confirmed`, go through the ledger item by item. The 
 - the ledger holds the final baseline, evidence, limitations, and a handoff; and
 - the user or named owner confirms the baseline.
 
-The handoff names the next step and where it happens, for example "write `plan.md` in a new grilling session" or "implement `plan.md` in a separate session". Retain the ledger for auditability, and clear `ACTIVE.md` only when the user archives the session or selects another one. Completing the questions never authorizes consequential work, publishing, deployment, or production writes.
+The handoff names the next step and where it happens, for example "write `plan.md` in a new grilling session" or "implement `plan.md` in a separate session". In a project with `.project-map/`, the next step after the decisions close is the spec, then slicing into build tickets (the `project-map` pipeline). Retain the ledger for auditability, and clear `ACTIVE.md` only when the user archives the session or selects another one. Completing the questions never authorizes consequential work, publishing, deployment, or production writes.
 
 For acceptance-specific evidence, use the project's acceptance process or the `behavioral-acceptance-review` Skill rather than duplicating its protocol here.
