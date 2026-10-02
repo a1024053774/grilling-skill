@@ -67,6 +67,20 @@ Rules:
 - The ledger never records implementation steps, test runs, or release progress. Those belong to the canonical project record after the handoff.
 - Before setting `status: confirmed`, every item must be `confirmed`, `rejected`, or `superseded`, or listed under Risks and conflicts with an owner.
 
+## Item states
+
+Give every meaningful item a stable ID and one state:
+
+- `confirmed`: explicitly accepted by the user or the named project owner;
+- `inferred`: a model interpretation awaiting confirmation;
+- `pending`: a decision not yet answered;
+- `rejected`: explicitly ruled out;
+- `superseded`: replaced by a later decision;
+- `unknown`: a fact that must be checked rather than guessed;
+- `blocked`: required evidence, access, authorization, or environment is unavailable.
+
+## Pointer and repair
+
 `ACTIVE.md` contains only a pointer, for example:
 
 ```markdown

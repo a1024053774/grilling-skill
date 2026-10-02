@@ -1,6 +1,19 @@
 # Agent-project lifecycle branches
 
-Read only the section for the current stage. Mark a branch `N/A` with a reason when the project has no such capability; do not leave generic placeholders. Each branch ends in the artifact named in the SKILL.md stage table.
+For an Agent project, the destination is usually the artifact of the earliest incomplete stage:
+
+| Entry point | Stage | Artifact |
+| --- | --- | --- |
+| Idea, problem, incident, or user pain | Plan / intent | `intent.md` |
+| Accepted intent or requirements | Design | `spec.md` |
+| Accepted spec or request to implement | Build planning | `plan.md` |
+| Existing implementation or changed Agent behavior | Test / acceptance | eval cases and evidence record |
+| Release or production request | Deploy | review, approval, and release record |
+| Live system, incident, or drift | Maintain | incident/control-band record, then a new `intent.md` |
+
+When several stages are in scope, work them in order and make each boundary explicit. Do not ask deployment questions while intent is unresolved.
+
+Read only the section for the current stage. Mark a branch `N/A` with a reason when the project has no such capability; do not leave generic placeholders. Each branch ends in the artifact named in the stage table above.
 
 ## Plan / intent
 
