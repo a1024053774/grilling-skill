@@ -16,12 +16,12 @@ Never break these:
 5. **One canonical source.** Use the project's declared canonical source when one exists; never silently duplicate it.
 6. **Done means confirmed.** The session is complete only when the user or named owner confirms the baseline, and completing the questions never authorizes consequential work.
 
-It is project-agnostic: do not assume a particular product, model provider, framework, repository layout, or business domain. Question the decisions that could change the outcome, expose missing evidence and unsafe assumptions, and stop at a clear human confirmation gate. A session is done when the way to its destination is clear and the accepted result is written to a canonical artifact. When the user does authorize implementation, record the handoff and do the work outside the grilling ledger; the ledger never tracks implementation progress.
+It is project-agnostic: do not assume a particular product, model provider, framework, repository layout, or business domain. Question the decisions that could change the outcome, expose missing evidence and unsafe assumptions, and stop at a clear human confirmation gate.
 
 ## Start: destination, sweep, size
 
 1. Read the workspace context described in [Source of truth](#source-of-truth-and-persistent-state).
-2. **Name the destination**: what reaching the end of this grilling looks like, such as an accepted `intent.md`, `spec.md`, or `plan.md`, or a locked decision. The destination fixes the scope, so settle it before anything else.
+2. **Name the destination**: what reaching the end of this grilling looks like, such as an accepted `intent.md`, `spec.md`, or `plan.md`, or a locked decision. The destination fixes the scope, so settle it before anything else, and record the user's own words for it and for the goal behind it: later summaries quote them rather than paraphrase them.
 3. **Sweep breadth-first**: fan out across the whole space once instead of drilling into one thread. Sort what you find into sharp questions, fog, and out-of-scope work (see [The map](#the-map)).
 4. **Size it.** When the sweep finds no fog and the route fits in this session, say so, grill in the conversation, and write only the accepted result to the canonical artifact; create `.grilling/` files only if the user asks. Otherwise create or resume the ledger.
 
@@ -41,8 +41,6 @@ Before each round, including after a long pause or context compaction:
 2. Treat confirmed decisions and constraints as the baseline.
 3. Record the previous answers, state changes, evidence, and conflicts in the ledger.
 4. Recompute the frontier and graduate any fog the answers made specifiable.
-
-If the pointer or ledger is missing, preserve what exists, mark the session `recovery-needed`, reconstruct only from clear evidence, and ask the user to confirm the recovered baseline.
 
 ## The map
 
@@ -77,15 +75,23 @@ A long grilling is not evidence that the design is right. First designs are rare
 
 ## Question rounds
 
-Ask the frontier in one round and number each question. When the frontier holds more than about five questions, ask the five that unblock the most and keep the rest on the frontier. A question whose answer depends on another question in the same round belongs to a later round.
+Ask the frontier in one round and number each question. When the frontier holds more than about five questions, ask the five that unblock the most and keep the rest on the frontier. A question whose answer depends on another question in the same round belongs to a later round. Ask only what would change the destination artifact: a question that only refines an earlier answer and leaves the artifact unchanged goes to fog or out of scope.
 
 Keep each question short enough to answer at a glance: the choice, the criteria, and one line on why it matters now. Evidence detail belongs in the ledger, not in the question. Lay the round out as in [references/round-format.md](references/round-format.md).
 
-After the user answers, map each answer to stable IDs, record explicit rejections and new inferences, expose conflicts, update the ledger, and recompute the frontier. Set the ledger to `awaiting-user` while waiting and back to `active` when continuing.
+Every recommendation names its basis: the destination, a confirmed decision or priority by ID, or an assumption stated as one. A recommendation that rests only on your own assumption says so.
+
+After the user answers, before the next round:
+
+1. Map each answer to a stable ID with its origin: `user`, or `recommended` when the user took the recommendation without adding a reason of their own. Record the assumptions a recommended answer carries, explicit rejections, and new inferences.
+2. **Check consistency.** Compare each new decision and its assumptions with every confirmed decision and constraint. Name any tension at the top of your reply, even a small one: two answers that each look right alone but cannot both hold. Do not carry both forward. Put a priority question on the frontier (when these two collide, which wins?) and record the answer as a priority constraint that later recommendations cite, so the same trade-off is not asked twice.
+3. Update the ledger and recompute the frontier: drop questions the answers made moot.
+
+Set the ledger to `awaiting-user` while waiting and back to `active` when continuing.
 
 When new evidence contradicts a confirmed decision, do not design around it. Put a reopen question on the frontier that names the decision and the evidence; mark the old decision `superseded` only after the user agrees.
 
-Every few rounds, or whenever the goal or a major constraint changes, give a compact drift check from the ledger: destination, out of scope, confirmed constraints, unresolved items, canonical artifact, and newly inferred items. Ask for correction only where the baseline changed.
+Give a compact drift check from the ledger when the user asks for progress or a drift check, and once before the handoff; do not schedule it on your own. It quotes the user's own words for the destination and goal, and separates the decisions the user made from those that rest only on accepted recommendations; the layout is in [references/round-format.md](references/round-format.md#drift-check). Ask for correction only where the baseline changed or rests on accepted recommendations.
 
 ## States and evidence
 
@@ -96,5 +102,3 @@ Label facts `observed`, `measured`, `inferred`, or `unknown`, and check them wit
 ## Finish and handoff
 
 Before marking the session `confirmed`, read [references/handoff.md](references/handoff.md): the stage gates and owners, the completion checklist to go through item by item, and what the handoff names.
-
-For acceptance-specific evidence, use the project's acceptance process or the `behavioral-acceptance-review` Skill rather than duplicating its protocol here.

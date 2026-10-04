@@ -19,6 +19,8 @@ Sections:
 
 <one or two lines: what reaching the end of this grilling looks like>
 
+> <the user's own words for it and for the goal behind it, quoted verbatim>
+
 ## Out of scope
 
 - <work ruled beyond the destination> | reason: ...
@@ -26,10 +28,12 @@ Sections:
 ## Confirmed constraints
 
 - C1 | state: confirmed | source: round 1 | ...
+- C2 | state: confirmed | priority | source: round 3, D4 vs D7 | when <A> and <B> collide, <A> wins
 
 ## Decisions so far
 
-- D1 | state: confirmed | type: compare | source: round 2 | <one-line gist> | rejected: <options and why> | detail: spec.md#section
+- D1 | state: confirmed | type: compare | origin: user | source: round 2 | <one-line gist> | rejected: <options and why> | detail: spec.md#section
+- D2 | state: confirmed | type: decide | origin: recommended | source: round 3 | <one-line gist> | basis: C1 | assumes: <assumption the recommendation carried>
 
 ## Facts
 
@@ -64,6 +68,7 @@ Rules:
 
 - A question moves from Frontier or Blocked to Decisions so far when answered; it is never listed in two places. A fog patch is deleted when it graduates into questions.
 - Prototype and research outputs are linked, not pasted.
+- `origin: recommended` marks a decision the user took from the agent's recommendation without adding a reason of their own. It counts as confirmed; the drift check lists it separately so the user can see which parts of the baseline are borrowed.
 - The ledger never records implementation steps, test runs, or release progress. Those belong to the canonical project record after the handoff.
 - Before setting `status: confirmed`, every item must be `confirmed`, `rejected`, or `superseded`, or listed under Risks and conflicts with an owner.
 
@@ -88,4 +93,4 @@ active_session: .grilling/payment-refactor.md
 session_id: grilling-payment-refactor-20260912
 ```
 
-When repairing a ledger, do not erase uncertain history. Add a recovery note, preserve the original content, and mark reconstructed entries `inferred` until the user confirms them.
+If the pointer or ledger is missing, preserve what exists, mark the session `recovery-needed`, reconstruct only from clear evidence, and ask the user to confirm the recovered baseline. When repairing a ledger, do not erase uncertain history. Add a recovery note, preserve the original content, and mark reconstructed entries `inferred` until the user confirms them.
